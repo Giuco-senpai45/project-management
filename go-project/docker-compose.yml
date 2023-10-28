@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  ld-db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_DB=projects-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5555:5432'
+
+  projects-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - USER=postgres
+      - PASSWORD=password
+      - HOST=go-project-ld-db-1
+      - DB_PORT=5432
+      - DB_NAME=projects-db
+      - APP_PORT=8080
+      - JWT_SECRET_KEY=secret_key
+
+  express-api:
+    build: 
+      context: ./BET-644
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - USER=postgres
+      - PASSWORD=password
+      - HOST=go-project-ld-db-1
+      - PORT=5432
+      - DATABASE=projects-db
+volumes:
+  pgdata:

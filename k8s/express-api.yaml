@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-api
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: express-api
+  template:
+    metadata:
+      labels:
+        app: express-api
+    spec:
+      containers:
+      - name: express-api
+        image: "giuco/express-api:1.0.0"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        env:
+          - name: USER
+            value: "postgres"
+          - name: PASSWORD
+            value: "password"
+          - name: HOST
+            value: "host.minikube.internal"
+          - name: PORT
+            value: "5555"
+          - name: DATABASE
+            value: "projects-db"
+        ports:
+        - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: express-api
+spec:
+  selector:
+    name: express-api
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
